@@ -90,7 +90,8 @@ public class Dijkstra {
         String curId = destinoId;
         while (curId != null) {
             caminho.add(rede.getEstacao(curId));
-            curId = predecessor.get(curId);
+            Estacao prev = predecessor.get(curId);
+            curId = (prev != null) ? prev.getId() : null;
         }
         Collections.reverse(caminho);
 

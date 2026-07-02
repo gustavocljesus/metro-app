@@ -1,7 +1,8 @@
 package algoritmos;
 
+import grafo.RedeMetro;
+import model.Conexao;
 import model.Estacao;
-import model.RedeMetro;
 
 import java.util.*;
 import java.util.stream.Collectors;

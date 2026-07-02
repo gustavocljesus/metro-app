@@ -1,4 +1,4 @@
-package eums;
+package enums;
 
 /**
  * Enumeração das linhas do metrô de São Paulo.

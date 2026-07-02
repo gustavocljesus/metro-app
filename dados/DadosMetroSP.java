@@ -1,6 +1,6 @@
 package dados;
 
-import enum.Linha;
+import enums.Linha;
 import grafo.RedeMetro;
 import model.Conexao;
 import model.Estacao;
@@ -73,31 +73,31 @@ public class DadosMetroSP {
             "Chácara Klabin"
         ), pesoTrecho);
 
-        // Integrações entre linhas (baldeações)
-        integrar(rede, "Sé", "L1", "L3", BALDEACAO_GRATUITA);
-        integrar(rede, "Paraíso", "L1", "L2", BALDEACAO_GRATUITA);
-        integrar(rede, "Ana Rosa", "L1", "L2", BALDEACAO_GRATUITA);
-        integrar(rede, "Paulista", "L2", "L4", BALDEACAO_GRATUITA);
-        integrar(rede, "Consolação", "L2", "L4", BALDEACAO_GRATUITA);
-        integrar(rede, "República", "L3", "L4", BALDEACAO_GRATUITA);
-        integrar(rede, "Pinheiros", "L4", "L9", BALDEACAO_GRATUITA);
-        integrar(rede, "Chácara Klabin", "L2", "L5", BALDEACAO_GRATUITA);
-        integrar(rede, "Santo Amaro", "L5", "L9", BALDEACAO_GRATUITA);
-        integrar(rede, "Vila Prudente", "L2", "L15", BALDEACAO_GRATUITA);
-        integrar(rede, "Tamanduateí", "L2", "L10", BALDEACAO_GRATUITA);
+        // Integrações entre linhas (baldeações gratuitas — 2 linhas)
+        integrar(rede, "Sé",             List.of("L1_AZUL", "L3_VERMELHA"),          BALDEACAO_GRATUITA);
+        integrar(rede, "Paraíso",        List.of("L1_AZUL", "L2_VERDE"),             BALDEACAO_GRATUITA);
+        integrar(rede, "Ana Rosa",       List.of("L1_AZUL", "L2_VERDE"),             BALDEACAO_GRATUITA);
+        integrar(rede, "Paulista",       List.of("L2_VERDE", "L4_AMARELA"),          BALDEACAO_GRATUITA);
+        integrar(rede, "Consolação",     List.of("L2_VERDE", "L4_AMARELA"),          BALDEACAO_GRATUITA);
+        integrar(rede, "República",      List.of("L3_VERMELHA", "L4_AMARELA"),       BALDEACAO_GRATUITA);
+        integrar(rede, "Pinheiros",      List.of("L4_AMARELA", "L9_ESMERALDA"),      BALDEACAO_GRATUITA);
+        integrar(rede, "Chácara Klabin", List.of("L2_VERDE", "L5_LILAS"),            BALDEACAO_GRATUITA);
+        integrar(rede, "Santo Amaro",    List.of("L5_LILAS", "L9_ESMERALDA"),        BALDEACAO_GRATUITA);
+        integrar(rede, "Vila Prudente",  List.of("L2_VERDE", "L15_PRATA"),           BALDEACAO_GRATUITA);
+        integrar(rede, "Tamanduateí",    List.of("L2_VERDE", "L10_TURQUESA"),        BALDEACAO_GRATUITA);
 
         // Integrações horárias (mais caras)
-        integrar(rede, "Luz", List.of("L1", "L4", "L7", "L8"), BALDEACAO_HORARIA);
-        integrar(rede, "Brás", List.of("L3", "L11", "L12"), BALDEACAO_HORARIA);
-        integrar(rede, "Tatuapé", List.of("L3", "L11", "L12"), BALDEACAO_HORARIA);
-        integrar(rede, "Palmeiras-Barra Funda", List.of("L3", "L7"), BALDEACAO_HORARIA);
-        integrar(rede, "Lapa", List.of("L7", "L8"), BALDEACAO_HORARIA);
-        integrar(rede, "Júlio Prestes", List.of("L7", "L8"), BALDEACAO_HORARIA);
-        integrar(rede, "Osasco", List.of("L8", "L9"), BALDEACAO_HORARIA);
-        integrar(rede, "Pres. Altino", List.of("L8", "L9"), BALDEACAO_HORARIA);
-        integrar(rede, "Engº Goulart", List.of("L11", "L12"), BALDEACAO_HORARIA);
-        integrar(rede, "Corinthians-Itaquera", List.of("L3", "L12"), BALDEACAO_HORARIA);
-        integrar(rede, "Poá", List.of("L11", "L12"), BALDEACAO_HORARIA);
+        integrar(rede, "Luz",                   List.of("L1_AZUL", "L4_AMARELA", "L7_RUBI", "L8_DIAMANTE"),       BALDEACAO_HORARIA);
+        integrar(rede, "Brás",                  List.of("L3_VERMELHA", "L11_CORAL", "L12_SAFIRA"),                BALDEACAO_HORARIA);
+        integrar(rede, "Tatuapé",               List.of("L3_VERMELHA", "L11_CORAL", "L12_SAFIRA"),                BALDEACAO_HORARIA);
+        integrar(rede, "Palmeiras-Barra Funda", List.of("L3_VERMELHA", "L7_RUBI"),                                BALDEACAO_HORARIA);
+        integrar(rede, "Lapa",                  List.of("L7_RUBI", "L8_DIAMANTE"),                                BALDEACAO_HORARIA);
+        integrar(rede, "Júlio Prestes",         List.of("L7_RUBI", "L8_DIAMANTE"),                                BALDEACAO_HORARIA);
+        integrar(rede, "Osasco",                List.of("L8_DIAMANTE", "L9_ESMERALDA"),                           BALDEACAO_HORARIA);
+        integrar(rede, "Pres. Altino",          List.of("L8_DIAMANTE", "L9_ESMERALDA"),                          BALDEACAO_HORARIA);
+        integrar(rede, "Engº Goulart",          List.of("L11_CORAL", "L12_SAFIRA"),                               BALDEACAO_HORARIA);
+        integrar(rede, "Corinthians-Itaquera",  List.of("L3_VERMELHA", "L12_SAFIRA"),                             BALDEACAO_HORARIA);
+        integrar(rede, "Poá",                   List.of("L11_CORAL", "L12_SAFIRA"),                               BALDEACAO_HORARIA);
 
         return rede;
     }
@@ -107,25 +107,36 @@ public class DadosMetroSP {
         for (int i = 0; i < estacoes.size(); i++) {
             String nome = estacoes.get(i);
             String id = idEstacao(nome, linha);
-            if (!rede.getEstacao(id).equals(id)) {
-                rede.adicionarEstacao(new Estacao(id, nome, linha.getNome()));
+            if (rede.getEstacao(id) == null) {
+                rede.adicionarEstacao(new Estacao(id, nome, linha.nome));
             }
             if (i > 0) {
                 String idAnt = idEstacao(estacoes.get(i - 1), linha);
                 rede.adicionarConexao(idAnt, id, peso);
+                rede.adicionarConexao(id, idAnt, peso);
             }
         }
     }
 
-    private static void integrar(RedeMetro rede, String estacaoNome, String... linhas) {
-        // Simplificado: adiciona arestas bidirecionais entre as plataformas
-        // Na verdade, seria necessário criar nós separados por linha
-        // Este método serve como marcação para integração
-    }
-
-    private static void integrar(RedeMetro rede, String estacaoNome, List<String> linhas, double peso) {
-        // Marca integração com peso específico
-        // Implementação detalhada dependeria de nós separados por linha
+    /**
+     * Cria conexões de baldeação entre todas as combinações de estações-nó
+     * que representam o mesmo ponto físico em linhas diferentes.
+     *
+     * @param rede         rede de metrô
+     * @param estacaoNome  nome físico da estação de integração
+     * @param linhasCod    lista de nomes dos valores do enum Linha (ex: "L1_AZUL")
+     * @param peso         custo da baldeação
+     */
+    private static void integrar(RedeMetro rede, String estacaoNome, List<String> linhasCod, double peso) {
+        for (int i = 0; i < linhasCod.size(); i++) {
+            for (int j = i + 1; j < linhasCod.size(); j++) {
+                String idA = linhasCod.get(i) + ":" + estacaoNome.replace(" ", "_");
+                String idB = linhasCod.get(j) + ":" + estacaoNome.replace(" ", "_");
+                if (rede.getEstacao(idA) == null || rede.getEstacao(idB) == null) continue;
+                rede.adicionarConexao(idA, idB, peso);
+                rede.adicionarConexao(idB, idA, peso);
+            }
+        }
     }
 
     private static String idEstacao(String nome, Linha linha) {

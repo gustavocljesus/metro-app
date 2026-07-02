@@ -1,7 +1,8 @@
 package algoritmos;
 
+import grafo.RedeMetro;
+import model.Conexao;
 import model.Estacao;
-import model.RedeMetro;
 
 import java.util.*;
 
@@ -60,7 +61,7 @@ public class DFS {
     public static boolean redeConectada(RedeMetro rede) {
         // Encontra primeira estação ativa
         Estacao primeira = null;
-        for (Estacao e : rede.getTodasEstacoes()) {
+        for (Estacao e : rede.getEstacoes()) {
             if (e.isAtiva()) {
                 primeira = e;
                 break;
@@ -89,7 +90,7 @@ public class DFS {
         }
 
         // Conta estações ativas
-        long ativas = rede.getTodasEstacoes().stream().filter(Estacao::isAtiva).count();
+        long ativas = rede.getEstacoes().stream().filter(Estacao::isAtiva).count();
         return visitados.size() == ativas;
     }
 
@@ -103,7 +104,7 @@ public class DFS {
         Set<String> visitados = new HashSet<>();
         Set<String> emRecursao = new HashSet<>();
 
-        for (Estacao e : rede.getTodasEstacoes()) {
+        for (Estacao e : rede.getEstacoes()) {
             if (!e.isAtiva() || visitados.contains(e.getId())) continue;
             if (dfsCiclo(rede, e.getId(), visitados, emRecursao, null)) {
                 return true;

@@ -1,21 +1,11 @@
 package algoritmos;
 
+import grafo.RedeMetro;
 import model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Implementação do algoritmo de Floyd-Warshall para cálculo de caminhos
- * mínimos entre todos os pares de estações na rede de metrô.
- *
- * <p>Esta implementação considera apenas as estaçōes ativas e devolve:
- * <ul>
- *   <li>matriz de distâncias {@code double[][]}</li>
- *   <li>matriz de predecessores {@code int[][]}</li>
- *   <li>métodos auxiliares para reconstrução de caminhos</li>
- * </ul>
- */
 public class FloydWarshall {
 
     /**
@@ -51,7 +41,7 @@ public class FloydWarshall {
         }
 
         // ---------- 4) Preencher de arestas diretas ----------
-        for (String id : reteIdsAtivos(rede)) {
+        for (String id : rede.getIdsAtivos()) {
             Estacao u = rede.getEstacao(id);
             if (!u.isAtiva()) continue;
             int i = indice.get(u);
@@ -84,11 +74,6 @@ public class FloydWarshall {
         return new Resultado(dist, prox);
     }
 
-    /** @returns conjunto de IDs das estações ativas */
-    private static Set<String> reteIdsAtivos(RedeMetro rhede) {
-        return rhede.getIdsAtivos().stream().toList();
-    }
-
     /**
      * Reconstrução do caminho a partir das matrizes {@code dist} e {@code prox}.
      *
@@ -98,7 +83,7 @@ public class FloydWarshall {
      * @param destinoId id da estação de destino
      * @return lista com os nomes das estações no caminho, ou lista vazia se indisponível
      */
-    public static List<String> reconstruirCaminho(Resultado.Resultado resultado,
+    public static List<String> reconstruirCaminho(Resultado resultado,
                                                   List<Estacao> estacoes,
                                                   String origemId,
                                                   String destinoId) {
