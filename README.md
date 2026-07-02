@@ -64,8 +64,6 @@ O projeto utiliza dados da **Rede Metropolitana de São Paulo (2026)** com:
 - Pesos de viagem estimados (2–4 min por trecho)  
 - Penalidades de transferência (3–5 min)
 
-Fontes: `references/dados-exemplo.md` e mapeamento visual do metrô.
-
 ---
 
 ## Como Usar
