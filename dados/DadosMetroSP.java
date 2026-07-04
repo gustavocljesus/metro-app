@@ -38,7 +38,7 @@ public class DadosMetroSP {
             "Tucuruvi", "Parada Inglesa", "Jd. São Paulo-Ayrton Senna", "Santana",
             "Carandiru", "Portuguesa-Tietê", "Armênia", "Tiradentes", "Luz",
             "São Bento", "Sé", "Japão-Liberdade", "São Joaquim", "Vergueiro",
-            "Paraíso", "Ana Rosa", "Vila Mariana", "Praça da Árvore", "Saúde",
+            "Paraíso", "Ana Rosa", "Vila Mariana", "Santa Cruz", "Praça da Árvore", "Saúde",
             "São Judas", "Conceição", "Jabaquara"
         ), pesoTrecho);
 
@@ -46,7 +46,7 @@ public class DadosMetroSP {
             "Vila Madalena", "Sumaré", "Clínicas", "Consolação", "Paulista",
             "Trianon-Masp", "Brigadeiro", "Paraíso", "Ana Rosa",
             "Chácara Klabin", "Alto do Ipiranga", "Santos-Imigrantes",
-            "Sacomã", "Vila Prudente"
+            "Sacomã", "Vila Prudente", "Tamanduateí"
         ), pesoTrecho);
 
         adicionarLinha(rede, Linha.L3_VERMELHA, List.of(
@@ -81,7 +81,7 @@ public class DadosMetroSP {
         ), pesoTrecho);
 
         adicionarLinha(rede, Linha.L8_DIAMANTE, List.of(
-            "Amador Bueno", "Ambuitá", "Santa Rita", "Itapevi", "Eng Cardoso",
+            "Amador Bueno", "Ambuitá", "Santa Rita", "Itapevi", "Engº Cardoso",
             "Sagrado Coração", "Jandira", "Jd. Silveira", "Jd. Belval", "Barueri",
             "Antonio João", "Santa Terezinha", "Carapicuíba", "Gen. Miguel Costa",
             "Quitaúna", "Com. Sampaio", "Osasco", "Pres. Altino",
@@ -91,7 +91,7 @@ public class DadosMetroSP {
 
         adicionarLinha(rede, Linha.L9_ESMERALDA, List.of(
             "Varginha", "Mendes-Vila Natal", "Grajaú", "Primavera-Interlagos",
-            "Autódromo", "Jurubatuba", "Socorro", "João Dias", "Granja Julieta",
+            "Autódromo", "Jurubatuba", "Socorro", "Santo Amaro", "João Dias", "Granja Julieta",
             "Morumbi", "Berrini", "Vila Olímpia", "Cidade Jardim", "Hebraica-Rebouças",
             "Pinheiros", "Cidade Universitária", "Villa Lobos-Jaguaré", "Ceasa", "Osasco", "Pres. Altino"
         ), pesoTrecho);
@@ -109,13 +109,13 @@ public class DadosMetroSP {
         ), pesoTrecho);
 
         adicionarLinha(rede, Linha.L12_SAFIRA, List.of(
-            "Calmon Viana", "Aracaré", "Itaquaquecetuba", "Eng Manoel Feio", "Jardim Romano", "Itaim Paulista",
-            "Jd. Helena-Vila Mara", "São Miguel Paulista", "Comendador Ermelino", "USP Leste", "Eng Goulart",
+            "Calmon Viana", "Aracaré", "Itaquaquecetuba", "Engº Manoel Feio", "Jardim Romano", "Itaim Paulista",
+            "Jd. Helena-Vila Mara", "São Miguel Paulista", "Comendador Ermelino", "USP Leste", "Engº Goulart",
             "Tatuapé", "Brás"
         ), pesoTrecho);
 
         adicionarLinha(rede, Linha.L13_JADE, List.of(
-            "Aeroporto-Guarulhos", "Guarulhos-Cecap", "Eng Goulart"
+            "Aeroporto-Guarulhos", "Guarulhos-Cecap", "Engº Goulart"
         ), pesoTrecho);
 
         adicionarLinha(rede, Linha.L15_PRATA, List.of(
@@ -157,7 +157,7 @@ public class DadosMetroSP {
 
         // Integrações horárias (mais caras)
         integrar(rede, "Tatuapé", List.of("L3_VERMELHA", "L11_CORAL"), BALDEACAO_HORARIA);
-        integrar(rede, "Corinthians-Itaquera", List.of("L3_VERMELHA", "L11_SAFIRA"), BALDEACAO_HORARIA);
+        integrar(rede, "Corinthians-Itaquera", List.of("L3_VERMELHA", "L11_CORAL"), BALDEACAO_HORARIA);
 
         return rede;
     }
