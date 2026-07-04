@@ -145,8 +145,6 @@ public class DadosMetroSP {
         integrar(rede, "Morumbi", List.of("L9_ESMERALDA", "L17_OURO"), BALDEACAO_GRATUITA);
         integrar(rede, "Campo Belo", List.of("L17_OURO", "L5_LILAS"), BALDEACAO_GRATUITA);
         integrar(rede, "Santa Cruz", List.of("L1_AZUL", "L5_LILAS"), BALDEACAO_GRATUITA);
-        integrar(rede, "Ana Rosa", List.of("L1_AZUL", "L2_VERDE"), BALDEACAO_GRATUITA);
-        integrar(rede, "Ana Rosa", List.of("L1_AZUL", "L2_VERDE"), BALDEACAO_GRATUITA);
         integrar(rede, "Palmeiras-Barra Funda", List.of("L7_RUBI", "L8_DIAMANTE",
          "L10_TURQUESA", "L11_CORAL", "L3_VERMELHA"), BALDEACAO_GRATUITA);
         integrar(rede, "Luz", List.of("L1_AZUL", "L11_CORAL", "L10_TURQUESA", "L4_AMARELA"), BALDEACAO_GRATUITA);
