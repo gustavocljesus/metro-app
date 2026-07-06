@@ -4,6 +4,7 @@ import grafo.ResultadoRota;
 import algoritmos.Dijkstra;
 import model.Conexao;
 import model.Estacao;
+import algoritmos.Betweenness;
 
 import javax.swing.*;
 import java.awt.*;
@@ -125,30 +126,21 @@ public class MapaMetroSPApp {
     }
 
     private static void mostrarMaisImportantes(RedeMetro rede) {
-        // Grau = nº de vizinhos DISTINTOS (evita inflar por arestas duplicadas)
-        Map<String, Set<String>> vizinhos = new HashMap<>();
-        for (String id : rede.getIds()) {
-            Set<String> conj = new HashSet<>();
-            for (Conexao c : rede.getConexoes(id)) conj.add(c.getDestino().getId());
-            vizinhos.put(id, conj);
-        }
-        List<String> ordenado = new ArrayList<>(vizinhos.keySet());
-        ordenado.sort((a, b) -> vizinhos.get(b).size() - vizinhos.get(a).size());
+    List<Map.Entry<String, Integer>> top = Betweenness.top(rede, 10);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Top 10 por grau (nº de conexões distintas):\n");
-        sb.append("[provisório — definição final de \"importância\" ainda em aberto]\n\n");
-        for (int i = 0; i < Math.min(10, ordenado.size()); i++) {
-            String id = ordenado.get(i);
-            Estacao e = rede.getEstacao(id);
-            sb.append(String.format("%2d. %s (%s) — grau %d%n",
-                i + 1, e.getNome(), e.getLinha(), vizinhos.get(id).size()));
-        }
-        JTextArea area = new JTextArea(sb.toString());
-        area.setEditable(false);
-        JOptionPane.showMessageDialog(null, new JScrollPane(area),
-            "Estações mais importantes", JOptionPane.INFORMATION_MESSAGE);
+    StringBuilder sb = new StringBuilder();
+    sb.append("Top 10 por centralidade de intermediação (betweenness)\n");
+    sb.append("[aproximação de caminho único — ver Betweenness.java]\n\n");
+    for (int i = 0; i < top.size(); i++) {
+        Map.Entry<String, Integer> ent = top.get(i);
+        sb.append(String.format("%2d. %-30s passagens=%d%n",
+            i + 1, ent.getKey(), ent.getValue()));
     }
+    JTextArea area = new JTextArea(sb.toString());
+    area.setEditable(false);
+    JOptionPane.showMessageDialog(null, new JScrollPane(area),
+        "Estações mais importantes", JOptionPane.INFORMATION_MESSAGE);
+}
 
     /** Painel que desenha a rede e trata cliques de seleção/interdição. */
     static class MapaPanel extends JPanel {
