@@ -14,19 +14,6 @@ import java.awt.geom.Line2D;
 import java.util.List;
 import java.util.*;
 
-/**
- * Esboço de interface gráfica para o Sistema de Rotas Inteligentes do MetroSP.
- *
- * O layout das estações NÃO é geograficamente fiel ao mapa real de São Paulo —
- * não há coordenadas no modelo de dados. As posições são calculadas por um
- * algoritmo de layout orientado a forças (force-directed / Fruchterman-Reingold
- * simplificado), que é ele mesmo um algoritmo de grafos, coerente com o escopo
- * acadêmico do projeto.
- *
- * ATENÇÃO: a definição de "estação mais importante" ainda é uma decisão de
- * design em aberto no projeto. Esta interface usa grau (nº de conexões
- * distintas) como aproximação provisória — não é a definição final.
- */
 public class MapaMetroSPApp {
 
     public static void main(String[] args) {
@@ -64,7 +51,7 @@ public class MapaMetroSPApp {
         painel.add(Box.createVerticalStrut(4));
 
         JTextArea instrucoes = new JTextArea(
-            "Clique 1: origem\nClique 2: destino (calcula rota)\nClique direito: interditar/reativar estação\nClique novamente: reinicia seleção"
+            "Clique 1: origem\nClique 2: destino (calcula as duas rotas)\nClique direito: interditar/reativar estação\nClique novamente: reinicia seleção"
         );
         instrucoes.setEditable(false);
         instrucoes.setOpaque(false);
@@ -72,6 +59,19 @@ public class MapaMetroSPApp {
         instrucoes.setAlignmentX(Component.LEFT_ALIGNMENT);
         painel.add(instrucoes);
         painel.add(Box.createVerticalStrut(10));
+
+        JLabel origemLabel = new JLabel("Origem: —");
+        origemLabel.setFont(origemLabel.getFont().deriveFont(12f));
+        origemLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painel.add(origemLabel);
+
+        JLabel destinoLabel = new JLabel("Destino: —");
+        destinoLabel.setFont(destinoLabel.getFont().deriveFont(12f));
+        destinoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painel.add(destinoLabel);
+        painel.add(Box.createVerticalStrut(10));
+
+        mapaPanel.setLabelsSelecao(origemLabel, destinoLabel);
 
         JButton limpar = new JButton("Limpar seleção");
         limpar.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -85,25 +85,12 @@ public class MapaMetroSPApp {
         painel.add(importantes);
         painel.add(Box.createVerticalStrut(10));
 
-        JLabel statusTitulo = new JLabel("Status da rota:");
-        statusTitulo.setFont(statusTitulo.getFont().deriveFont(Font.BOLD, 12f));
-        statusTitulo.setAlignmentX(Component.LEFT_ALIGNMENT);
-        painel.add(statusTitulo);
-
-        JTextArea status = new JTextArea("Nenhuma seleção.");
-        status.setEditable(false);
-        status.setLineWrap(true);
-        status.setWrapStyleWord(true);
-        status.setFont(status.getFont().deriveFont(12f));
-        status.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JScrollPane statusScroll = new JScrollPane(status);
-        statusScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
-        statusScroll.setPreferredSize(new Dimension(240, 140));
-        statusScroll.setMaximumSize(new Dimension(240, 140));
-        painel.add(statusScroll);
-        mapaPanel.setStatusArea(status);
-
+        JButton verDetalhes = new JButton("Ver detalhes da rota");
+        verDetalhes.setAlignmentX(Component.LEFT_ALIGNMENT);
+        verDetalhes.addActionListener(e -> mapaPanel.mostrarDetalhesRota());
+        painel.add(verDetalhes);
         painel.add(Box.createVerticalStrut(10));
+
         JLabel legendaTitulo = new JLabel("Linhas:");
         legendaTitulo.setFont(legendaTitulo.getFont().deriveFont(Font.BOLD, 12f));
         legendaTitulo.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -122,27 +109,44 @@ public class MapaMetroSPApp {
             painel.add(linha);
         }
 
+        JPanel legendaRota = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        legendaRota.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel corPreta = new JPanel();
+        corPreta.setBackground(Color.BLACK);
+        corPreta.setPreferredSize(new Dimension(12, 12));
+        legendaRota.add(corPreta);
+        legendaRota.add(new JLabel("Menor tempo"));
+        painel.add(legendaRota);
+
+        JPanel legendaRota2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        legendaRota2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel corAzul = new JPanel();
+        corAzul.setBackground(MapaPanel.COR_MENOS_BALDEACOES);
+        corAzul.setPreferredSize(new Dimension(12, 12));
+        legendaRota2.add(corAzul);
+        legendaRota2.add(new JLabel("Menos baldeações (trecho exclusivo)"));
+        painel.add(legendaRota2);
+
         return painel;
     }
 
     private static void mostrarMaisImportantes(RedeMetro rede) {
-    List<Map.Entry<String, Integer>> top = Betweenness.top(rede, 10);
+        List<Map.Entry<String, Integer>> top = Betweenness.top(rede, 10);
 
-    StringBuilder sb = new StringBuilder();
-    sb.append("Top 10 por centralidade de intermediação (betweenness)\n");
-    sb.append("[aproximação de caminho único — ver Betweenness.java]\n\n");
-    for (int i = 0; i < top.size(); i++) {
-        Map.Entry<String, Integer> ent = top.get(i);
-        sb.append(String.format("%2d. %-30s passagens=%d%n",
-            i + 1, ent.getKey(), ent.getValue()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("Top 10 por centralidade de intermediação (betweenness)\n");
+        sb.append("[aproximação de caminho único — ver Betweenness.java]\n\n");
+        for (int i = 0; i < top.size(); i++) {
+            Map.Entry<String, Integer> ent = top.get(i);
+            sb.append(String.format("%2d. %-30s passagens=%d%n",
+                i + 1, ent.getKey(), ent.getValue()));
+        }
+        JTextArea area = new JTextArea(sb.toString());
+        area.setEditable(false);
+        JOptionPane.showMessageDialog(null, new JScrollPane(area),
+            "Estações mais importantes", JOptionPane.INFORMATION_MESSAGE);
     }
-    JTextArea area = new JTextArea(sb.toString());
-    area.setEditable(false);
-    JOptionPane.showMessageDialog(null, new JScrollPane(area),
-        "Estações mais importantes", JOptionPane.INFORMATION_MESSAGE);
-}
 
-    /** Painel que desenha a rede e trata cliques de seleção/interdição. */
     static class MapaPanel extends JPanel {
 
         static final Map<String, Color> CORES = new LinkedHashMap<>();
@@ -163,6 +167,8 @@ public class MapaMetroSPApp {
             CORES.put("Linha 17 - Ouro", new Color(180, 140, 0));
         }
 
+        static final Color COR_MENOS_BALDEACOES = new Color(30, 90, 220);
+
         private final RedeMetro rede;
         private final Map<String, double[]> pos;
         private final Set<String> nomesHub = new HashSet<>();
@@ -170,7 +176,10 @@ public class MapaMetroSPApp {
         private String origemSel;
         private String destinoSel;
         private ResultadoRota rotaAtual;
-        private JTextArea statusArea;
+        private ResultadoRota rotaMenosBaldeacoes;
+
+        private JLabel origemLabel;
+        private JLabel destinoLabel;
 
         private static final int LARGURA = 2200;
         private static final int ALTURA = 1600;
@@ -209,6 +218,8 @@ public class MapaMetroSPApp {
                         origemSel = id;
                         destinoSel = null;
                         rotaAtual = null;
+                        rotaMenosBaldeacoes = null;
+                        atualizarLabelsSelecao();
                     } else if (destinoSel == null && !id.equals(origemSel)) {
                         destinoSel = id;
                         calcularRota();
@@ -216,8 +227,10 @@ public class MapaMetroSPApp {
                         origemSel = id;
                         destinoSel = null;
                         rotaAtual = null;
+                        rotaMenosBaldeacoes = null;
+                        atualizarLabelsSelecao();
                     }
-                    atualizarStatus();
+                    atualizarLabelsSelecao();
                     repaint();
                 }
             });
@@ -232,44 +245,71 @@ public class MapaMetroSPApp {
             });
         }
 
-        void setStatusArea(JTextArea area) { this.statusArea = area; }
-
         void limparSelecao() {
             origemSel = null;
             destinoSel = null;
             rotaAtual = null;
-            atualizarStatus();
+            rotaMenosBaldeacoes = null;
+            atualizarLabelsSelecao();
             repaint();
         }
 
+        void setLabelsSelecao(JLabel origem, JLabel destino) {
+            this.origemLabel = origem;
+            this.destinoLabel = destino;
+            atualizarLabelsSelecao();
+        }
+
+        private void atualizarLabelsSelecao() {
+            if (origemLabel == null || destinoLabel == null) return;
+            origemLabel.setText("Origem: " + (origemSel == null ? "—"
+                : rede.getEstacao(origemSel).getNome() + " (" + rede.getEstacao(origemSel).getLinha() + ")"));
+            destinoLabel.setText("Destino: " + (destinoSel == null ? "—"
+                : rede.getEstacao(destinoSel).getNome() + " (" + rede.getEstacao(destinoSel).getLinha() + ")"));
+        }
         private void recalcularSeNecessario() {
             if (origemSel != null && destinoSel != null) calcularRota();
         }
 
+        /** Calcula os dois algoritmos na mesma seleção de origem/destino. */
         private void calcularRota() {
             rotaAtual = Dijkstra.calcularCaminhoMinimo(rede, origemSel, destinoSel);
-            atualizarStatus();
+            rotaMenosBaldeacoes = Dijkstra.calcularMenosBaldeacoes(rede, origemSel, destinoSel);
         }
 
-        private void atualizarStatus() {
-            if (statusArea == null) return;
+        /** Exibe os resultados calculados em uma janela de diálogo separada. */
+        void mostrarDetalhesRota() {
+            String texto;
             if (origemSel == null) {
-                statusArea.setText("Nenhuma seleção.");
+                texto = "Nenhuma seleção.";
             } else if (destinoSel == null) {
-                statusArea.setText("Origem: " + rede.getEstacao(origemSel).getNome()
-                    + "\nClique no destino.");
+                texto = "Origem: " + rede.getEstacao(origemSel).getNome() + "\nClique no destino.";
             } else if (rotaAtual == null || rotaAtual.éVazio()) {
-                statusArea.setText("Origem: " + rede.getEstacao(origemSel).getNome()
+                texto = "Origem: " + rede.getEstacao(origemSel).getNome()
                     + "\nDestino: " + rede.getEstacao(destinoSel).getNome()
-                    + "\n\nSem rota disponível (verifique estações interditadas).");
+                    + "\n\nSem rota disponível (verifique estações interditadas).";
             } else {
-                statusArea.setText(rotaAtual.toString());
+                boolean mesmaRota = rotaMenosBaldeacoes != null
+                    && !rotaMenosBaldeacoes.éVazio()
+                    && rotaAtual.getCaminho().equals(rotaMenosBaldeacoes.getCaminho());
+                if (mesmaRota) {
+                    texto = "A rota mais rápida já é a de menos baldeações:\n\n" + rotaAtual;
+                } else {
+                    texto = "Rota mais rápida:\n" + rotaAtual
+                        + "\n\n---\n\nRota com menos baldeações:\n" + rotaMenosBaldeacoes;
+                }
             }
+            JTextArea area = new JTextArea(texto);
+            area.setEditable(false);
+            area.setFont(area.getFont().deriveFont(12f));
+            JScrollPane scroll = new JScrollPane(area);
+            scroll.setPreferredSize(new Dimension(360, 220));
+            JOptionPane.showMessageDialog(this, scroll, "Detalhes da rota", JOptionPane.INFORMATION_MESSAGE);
         }
 
         private String estacaoMaisProxima(Point p) {
             String melhor = null;
-            double melhorDist = 12; // raio de tolerância de clique/hover em px
+            double melhorDist = 12;
             for (Map.Entry<String, double[]> ent : pos.entrySet()) {
                 double dx = ent.getValue()[0] - p.x;
                 double dy = ent.getValue()[1] - p.y;
@@ -279,10 +319,10 @@ public class MapaMetroSPApp {
             return melhor;
         }
 
-        private Set<String> paresDoCaminho() {
+        private Set<String> paresDoCaminho(ResultadoRota rota) {
             Set<String> pares = new HashSet<>();
-            if (rotaAtual == null || rotaAtual.éVazio()) return pares;
-            List<Estacao> caminho = rotaAtual.getCaminho();
+            if (rota == null || rota.éVazio()) return pares;
+            List<Estacao> caminho = rota.getCaminho();
             for (int i = 1; i < caminho.size(); i++) {
                 pares.add(chave(caminho.get(i - 1).getId(), caminho.get(i).getId()));
             }
@@ -299,7 +339,12 @@ public class MapaMetroSPApp {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            Set<String> pathPares = paresDoCaminho();
+            Set<String> paresRapida = paresDoCaminho(rotaAtual);
+            Set<String> paresBaldeacao = paresDoCaminho(rotaMenosBaldeacoes);
+            // trecho exclusivo da rota de menos baldeações (não presente na rota rápida)
+            Set<String> paresExclusivosBaldeacao = new HashSet<>(paresBaldeacao);
+            paresExclusivosBaldeacao.removeAll(paresRapida);
+
             Set<String> desenhadas = new HashSet<>();
 
             for (String id : rede.getIds()) {
@@ -313,11 +358,14 @@ public class MapaMetroSPApp {
                     Estacao eu = rede.getEstacao(id);
                     Estacao ev = rede.getEstacao(outro);
                     boolean mesmaLinha = eu.getLinha().equals(ev.getLinha());
-                    boolean noCaminho = pathPares.contains(k);
 
-                    if (noCaminho) {
+                    if (paresRapida.contains(k)) {
                         g2.setStroke(new BasicStroke(4.5f));
                         g2.setColor(Color.BLACK);
+                    } else if (paresExclusivosBaldeacao.contains(k)) {
+                        g2.setStroke(new BasicStroke(4f, BasicStroke.CAP_BUTT,
+                            BasicStroke.JOIN_MITER, 10, new float[]{6f, 4f}, 0));
+                        g2.setColor(COR_MENOS_BALDEACOES);
                     } else if (mesmaLinha) {
                         g2.setStroke(new BasicStroke(2.5f));
                         g2.setColor(CORES.getOrDefault(eu.getLinha(), Color.DARK_GRAY));
@@ -364,12 +412,6 @@ public class MapaMetroSPApp {
             }
         }
 
-        /**
-         * Layout orientado a forças (Fruchterman-Reingold simplificado):
-         * nós se repelem mutuamente, arestas atraem seus extremos.
-         * NÃO representa geografia real — é uma disposição estética
-         * derivada apenas da topologia do grafo.
-         */
         private static Map<String, double[]> calcularLayoutForceDirected(RedeMetro rede, int largura, int altura) {
             List<String> ids = new ArrayList<>(rede.getIds());
             int n = ids.size();
