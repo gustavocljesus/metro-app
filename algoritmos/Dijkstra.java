@@ -123,6 +123,121 @@ public class Dijkstra {
         return calcularCaminhoMinimo(rede, origemId, destinoId);
     }
 
+/**
+ * Calcula a rota com o MENOR NÚMERO DE BALDEAÇÕES entre duas estações,
+ * usando tempo como critério de desempate (comparação lexicográfica:
+ * baldeações primeiro, depois tempo). Diferente de calcularComBalcao,
+ * que apenas desincentiva trocas via penalidade somada ao peso —
+ * este método garante o mínimo de baldeações por construção.
+ *
+ * @param rede       rede de metrô
+ * @param origemId   id da estação de origem
+ * @param destinoId  id da estação de destino
+ * @return resultado com o caminho de menor número de baldeações
+ */
+public static ResultadoRota calcularMenosBaldeacoes(RedeMetro rede, String origemId, String destinoId) {
+    Estacao origem = rede.getEstacao(origemId);
+    Estacao destino = rede.getEstacao(destinoId);
+    if (origem == null || destino == null || !origem.isAtiva() || !destino.isAtiva()) {
+        return new ResultadoRota(Collections.emptyList(), 0, 0);
+    }
+    if (origemId.equals(destinoId)) {
+        return new ResultadoRota(Collections.singletonList(origem), 0.0, 0);
+    }
+
+    Map<String, Integer> baldeacoesAcum = new HashMap<>();
+    Map<String, Double> tempoAcum = new HashMap<>();
+    Map<String, Estacao> predecessor = new HashMap<>();
+    Map<String, String> linhaChegada = new HashMap<>(); // linha usada para chegar em cada vértice
+
+    Comparator<ParLex> comparador = Comparator
+            .comparingInt((ParLex p) -> p.baldeacoes)
+            .thenComparingDouble(p -> p.tempo);
+    PriorityQueue<ParLex> fila = new PriorityQueue<>(comparador);
+
+    for (Estacao e : rede.getEstacoes()) {
+        baldeacoesAcum.put(e.getId(), Integer.MAX_VALUE);
+        tempoAcum.put(e.getId(), INFINITO);
+    }
+    baldeacoesAcum.put(origemId, 0);
+    tempoAcum.put(origemId, 0.0);
+    linhaChegada.put(origemId, origem.getLinha());
+    fila.add(new ParLex(0, 0.0, origemId));
+
+    while (!fila.isEmpty()) {
+        ParLex atual = fila.poll();
+        String uId = atual.estacaoId;
+
+        // entrada obsoleta
+        if (atual.baldeacoes > baldeacoesAcum.get(uId)
+                || (atual.baldeacoes == baldeacoesAcum.get(uId) && atual.tempo > tempoAcum.get(uId))) {
+            continue;
+        }
+
+        Estacao u = rede.getEstacao(uId);
+        if (!u.isAtiva()) continue;
+        if (uId.equals(destinoId)) break;
+
+        String linhaAtual = linhaChegada.get(uId);
+
+        for (Conexao c : rede.getConexoes(uId)) {
+            Estacao v = c.getDestino();
+            if (!v.isAtiva()) continue;
+
+            boolean trocaLinha = !linhaAtual.equals(v.getLinha());
+            int novoBaldeacoes = baldeacoesAcum.get(uId) + (trocaLinha ? 1 : 0);
+            double novoTempo = tempoAcum.get(uId) + c.getPeso();
+
+            int baldeacoesAtualV = baldeacoesAcum.get(v.getId());
+            double tempoAtualV = tempoAcum.get(v.getId());
+
+            boolean melhor = novoBaldeacoes < baldeacoesAtualV
+                    || (novoBaldeacoes == baldeacoesAtualV && novoTempo < tempoAtualV);
+
+            if (melhor) {
+                baldeacoesAcum.put(v.getId(), novoBaldeacoes);
+                tempoAcum.put(v.getId(), novoTempo);
+                predecessor.put(v.getId(), u);
+                linhaChegada.put(v.getId(), v.getLinha());
+                fila.add(new ParLex(novoBaldeacoes, novoTempo, v.getId()));
+            }
+        }
+    }
+
+    if (!predecessor.containsKey(destinoId) && !origemId.equals(destinoId)) {
+        return new ResultadoRota(Collections.emptyList(), 0, 0);
+    }
+
+    List<Estacao> caminho = new ArrayList<>();
+    String curId = destinoId;
+    while (curId != null) {
+        caminho.add(rede.getEstacao(curId));
+        Estacao prev = predecessor.get(curId);
+        curId = (prev != null) ? prev.getId() : null;
+    }
+    Collections.reverse(caminho);
+
+    int baldeacoesReais = 0;
+    for (int i = 1; i < caminho.size(); i++) {
+        if (!caminho.get(i).getLinha().equals(caminho.get(i - 1).getLinha())) baldeacoesReais++;
+    }
+
+    return new ResultadoRota(caminho, tempoAcum.get(destinoId), baldeacoesReais);
+}
+
+/** Tripla (baldeações, tempo, id) para a fila de prioridade lexicográfica. */
+private static class ParLex {
+    final int baldeacoes;
+    final double tempo;
+    final String estacaoId;
+
+    ParLex(int baldeacoes, double tempo, String estacaoId) {
+        this.baldeacoes = baldeacoes;
+        this.tempo = tempo;
+        this.estacaoId = estacaoId;
+    }
+}
+
     /** Par (custo, idEstação) para uso na fila de prioridade. */
     private static class Par {
         final double custo;
