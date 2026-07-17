@@ -31,13 +31,13 @@ public class ResultadoRota {
         return baldeacoes;
     }
 
-    public boolean éVazio() {
+    public boolean estaVazio() {
         return caminho == null || caminho.isEmpty();
     }
 
     @Override
     public String toString() {
-        if (éVazio()) {
+        if (estaVazio()) {
             return "Sem rota disponivel";
         }
 

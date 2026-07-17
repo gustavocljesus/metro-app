@@ -2,88 +2,145 @@
 
 Use este arquivo para continuar o trabalho com outra IA ou em outra conversa.
 
-## Padrao combinado
+## Padrão combinado
 
-Ao final de cada alteracao, verificacao ou pedido, gerar um resumo simples com:
-
+Ao final de cada alteração, verificação ou pedido, gerar um resumo simples com:
 - o que foi feito;
 - arquivos principais alterados;
-- verificacao executada;
-- proximo passo sugerido, se houver.
+- verificação executada;
+- próximo passo sugerido, se houver.
 
-## Estado atual
+## Estado atual do projeto
 
-- Projeto reorganizado para o layout Java padrao:
-  - `src/main/java`: codigo principal.
-  - `src/test/java`: testes simples.
-- A aplicacao Swing fica em `src/main/java/app/MapaMetroSPApp.java` com `package app`.
-- A arquitetura foi unificada em `metro.*`.
-- Os pacotes antigos `algoritmos`, `dados`, `enums`, `grafo` e `model` foram removidos.
-- A decisao atual e usar `java.util` normalmente no projeto.
-- Os algoritmos principais estao em `src/main/java/metro/algoritmos`.
+### Estrutura
+- Layout Java padrão: `src/main/java` (código), `src/test/java` (testes)
+- Interface Swing: `src/main/java/app/MapaMetroSPApp.java` (original) e `MapaMetroSPApp_Test.java` (cópia de teste com visual atualizado)
+- Pacotes: `metro.model`, `metro.algoritmos`, `metro.dados`, `metro.enums`
 
-## Observacao importante
+### Interface visual (MapaMetroSPApp_Test.java)
+A interface passou por uma modernização completa com tema "painel LED do Metrô de SP":
 
-Nao existem mais duas arquiteturas ativas no projeto.
+**Tema escuro:**
+- Fundo `#111122` com gradiente radial
+- Painel lateral `#16213e` com texto branco/cinza
+- Scrollbar customizada (thumb arredondado, sem setas)
+- Grid ultra-sutil no fundo (opacidade ~3%)
+- LEDs desligados decorativos (pontos aleatórios)
+- Vinheta nas bordas (escurecimento radial)
 
-- `metro.model.Grafo` e o grafo principal.
-- `metro.dados.DadosMetroSP` carrega os dados reais.
-- `app.MapaMetroSPApp` usa diretamente `metro.*`.
-- `metro.algoritmos` contem Dijkstra, BFS, Floyd-Warshall, Betweenness e VerificadorConectividade.
+**Trilhos luminosos:**
+- Glow de 3 camadas (16px, 10px, 5px) com opacidade progressiva
+- Glow pulsante lento (variação senoidal)
+- Reflexos pontuais ao longo das linhas (LEDs individuais)
+- Setas decorativas discretas no meio de cada trecho (cor da linha, opacidade ~22%)
+- Conexões de baldeação removidas (só anel na estação)
 
-## Como a interface funciona hoje
+**Estações (LEDs):**
+- Tamanhos: comum 5px, baldeação 8px, terminal 7px, origem/destino 11px
+- Halo multi-camada (glow externo + interno)
+- Brilho especular (reflexo branco superior esquerdo)
+- Anel de baldeação (cinza) e anel de terminal (cor da linha)
+- Pulse animado para origem/destino
+- Tags "ORIGEM" (verde) e "DESTINO" (vermelho) acima da estação
 
-- A interface principal e uma janela Swing com o mapa no centro e um painel lateral a direita.
-- O mapa e esquematico: as linhas sao organizadas horizontalmente, cada linha tem sua cor e as estacoes aparecem como circulos.
-- Estacoes de baldeacao aparecem com circulos maiores quando existem estacoes com o mesmo nome em linhas diferentes.
-- O usuario clica com o botao esquerdo em uma estacao para escolher a origem.
-- Depois clica com o botao esquerdo em outra estacao para escolher o destino e calcular a rota.
-- A rota mais rapida e destacada em preto e a rota de menos baldeacoes aparece tracejada em azul quando tiver trechos diferentes.
-- Uma bolinha amarela animada percorre a rota mais rapida calculada.
-- O botao direito interdita ou reativa uma estacao; se ja existir origem e destino, a rota e recalculada.
-- O painel lateral mostra instrucoes, status em tempo real, botoes de acao e legenda visual das cores das linhas.
-- O status informa selecao de origem, pedido de destino, calculo de rota, rota encontrada, ausencia de rota e interdicao/reativacao.
-- O botao `Limpar selecao` zera origem, destino, rotas e animacao.
-- O botao `Ver detalhes da rota` mostra em uma janela a rota mais rapida e a rota com menos baldeacoes.
-- O botao `Estacoes mais importantes` mostra o ranking calculado por Betweenness.
-- O painel lateral tem botoes de zoom `-` e `+`, com indicador percentual.
-- O zoom escala o desenho do mapa e os cliques continuam funcionando porque a coordenada do mouse e ajustada pelo fator de zoom.
-- A area do mapa aparece dentro de um quadro visual com borda e titulo centralizado `Metro de Sao Paulo`.
-- Ao passar o mouse sobre uma estacao, aparece tooltip com nome e linha.
+**Rota ativa:**
+- Branco com glow pulsante (3 camadas)
+- Sombra sob a linha para profundidade
+- Animação sequencial de acendimento (~200ms por estação)
+- LED indicador pulsante (substitui bolinha amarela)
+- Setas de sentido na rota (azul `#44AAFF`, contorno branco, tamanho 9)
+- Rota de menos baldeações tracejada em azul
 
-## Ultima verificacao
+**Labels:**
+- Terminais, baldeações e estações da rota sempre visíveis
+- Hover mostra nome de qualquer estação
+- Fundo escuro com cantos arredondados
+- Nomes das linhas no mapa (ex: "1-AZUL")
 
-- Foram adicionados botoes de zoom no painel lateral, variando de 60% a 180%.
-- O mapa agora e desenhado dentro de um quadro retangular com titulo centralizado no topo.
-- Arquivo alterado nesta etapa: `src/main/java/app/MapaMetroSPApp.java`.
-- Compilacao completa com `javac -encoding UTF-8 -d metro-app\out`.
-- `testes.TesteConexao`: rede conectada retornou `true`.
-- `testes.TesteCaminho`: BFS encontrou ida e volta na Linha 1.
-- `testes.TesteMenosBaldeacoes`: 0 falhas.
+**HUD de rota:**
+- Sempre visível (mostra estado atual)
+- Fundo translúcido com borda azul
+- Ícones desenhados em Graphics2D (círculo verde/vermelho, relógio)
+- Mostra origem, destino, tempo e baldeações
 
-## Verificacao anterior
+**Moldura:**
+- Borda dupla com cantos industriais (quadrados 4x4)
+- Título "Metrô de São Paulo" com linha decorativa e marcadores laterais
 
-- Painel lateral recebeu status em tempo real, legenda visual das linhas e acabamento basico melhorado.
-- O status agora informa selecao de origem, destino, calculo de rota, rota encontrada, ausencia de rota e interdicao/reativacao de estacao.
-- Arquivo alterado nesta etapa: `src/main/java/app/MapaMetroSPApp.java`.
-- Compilacao completa com `javac -encoding UTF-8 -d metro-app\out`.
-- `testes.TesteConexao`: rede conectada retornou `true`.
-- `testes.TesteCaminho`: BFS encontrou ida e volta na Linha 1.
-- `testes.TesteMenosBaldeacoes`: 0 falhas.
+**Zoom:**
+- Suave (interpolação com Timer, fator 0.20)
+- Range: 60% a 180%
 
-## Verificacao inicial da UI esquematica
+### Algoritmos (metro.algoritmos)
+- **Dijkstra** (`calcularCaminhoMinimo`): rota de menor custo (tempo)
+- **Dijkstra** (`calcularMenosBaldeacoes`): rota com menos baldeações (prioridade), tempo como desempate
+- **BFS**: busca em largura
+- **Floyd-Warshall**: caminhos mais curtos entre todos os pares
+- **Betweenness**: centralidade de intermediação
+- **VerificadorConectividade**: verifica se a rede está conectada
 
-- Interface Swing substituida por uma versao esquematica com linhas organizadas e bolinha animada na rota.
-- Compilacao completa com `javac -encoding UTF-8 -d out`.
-- `testes.TesteConexao`: rede conectada retornou `true`.
-- `testes.TesteCaminho`: BFS encontrou ida e volta na Linha 1.
-- `testes.TesteMenosBaldeacoes`: 0 falhas.
-- `app.MapaMetroSPApp`: UI nova iniciou e permaneceu em execucao por 5 segundos.
+### Dados (metro.dados)
+- `DadosMetroSP.carregar()`: carrega 14 linhas com ~200 estações
+- Conexões bidirecionais dentro de cada linha
+- Integrações (baldeações) entre linhas com peso adicional
+- Pesos: Metrô 2.0min, ViaQuatro 2.5min, CPTM/TIC 3.0min, Jade 4.0min
 
-## Proximo passo sugerido
+### Testes (src/test/java)
+- `TesteConexao`: rede conectada
+- `TesteCaminho`: BFS ida/volta Linha 1
+- `TesteMenosBaldeacoes`: rotas com menos baldeações
 
-- Melhorar visual das conexoes entre linhas e estacoes, principalmente em regioes de baldeacao.
-- Permitir busca digitada de origem e destino com lista/autocomplete.
-- Verificar visualmente se a bolinha animada esta seguindo exatamente o caminho mais curto calculado.
-- Continuar refinando cores, espacamento e acabamento geral da tela.
-- Criar testes para funcionalidades importantes da aplicacao e dos algoritmos.
+## Análise do algoritmo Dijkstra
+
+O Dijkstra está implementado corretamente:
+- Usa PriorityQueue com ordenação por custo
+- Relaxamento de arestas correto
+- Reconstrução de caminho via mapa de anteriores
+- `break` ao encontrar destino é válido (Dijkstra garante custo mínimo)
+
+**Possível causa do "ultrapasso":**
+O grafo é bidirecionado dentro de cada linha, mas as baldeações são conexões específicas. O Dijkstra pode encontrar uma rota que visualmente parece "ultrapassar" o destino porque:
+1. A rota mais rápida pode usar uma baldeação que passa "perto" visualmente do destino
+2. O layout esquemático (linhas horizontais) pode tornar uma rota indireta mais curta em tempo
+3. Exemplo: ir de uma estação A para B pode passar por C (que fica visualmente depois de B) se a baldeação em C for mais eficiente
+
+**Não há bug no algoritmo** — o comportamento é correto do ponto de vista de custo/tempo.
+
+## Funcionalidades pendentes
+
+### Alta prioridade
+- [x] **Escolha de rotas**: radio buttons no sidebar ("Mais rápida" / "Menos baldeações"), habilitados ao calcular rota, com animação da rota selecionada
+- [ ] **Verificação visual da rota**: confirmar que a animação segue exatamente o caminho calculado
+
+### Média prioridade
+- [ ] Busca digitada de origem e destino com autocomplete
+- [ ] Testes automatizados para os algoritmos
+
+### Baixa prioridade
+- [ ] Melhorar visual das conexões entre linhas
+- [ ] Refinamento contínuo da interface
+
+## Arquivos principais
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `app/MapaMetroSPApp.java` | Interface original (sem visual LED) |
+| `app/MapaMetroSPApp_Test.java` | Interface com visual LED atualizado |
+| `metro/model/Grafo.java` | Grafo direcionado com adjacências |
+| `metro/model/Estacao.java` | Modelo de estação (id, nome, linha, ativa) |
+| `metro/model/Conexao.java` | Conexão ponderada (origem, destino, tempo) |
+| `metro/algoritmos/Dijkstra.java` | Dijkstra (custo mínimo + menos baldeações) |
+| `metro/algoritmos/ResultadoRota.java` | Resultado: caminho, custo, baldeações |
+| `metro/dados/DadosMetroSP.java` | Dados da rede de SP |
+| `metro/enums/Linha.java` | Enum das linhas com pesos |
+
+## Última verificação
+
+- Escolha de rotas implementada com radio buttons no sidebar
+- Radio buttons desabilitados sem rota, habilitados ao calcular
+- Animação muda conforme rota selecionada (rápida ou menos baldeações)
+- Status mostra tipo de rota ativa: `[Rápida] 25 min, 2 bal.`
+- Compilação sem erros
+- Aplicação executa e interage corretamente
+- HUD sempre visível (mostra estado sem rota)
+- Tags ORIGEM/DESTINO funcionais
